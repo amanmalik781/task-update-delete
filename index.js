@@ -30,9 +30,10 @@ const Task = mongoose.model('Task', taskSchema);
 
 // Retrieve task list by communicating to another microservice
 const getTaskList = () => {
-    axios.get('http://localhost:3001/tasks')
+    // change the URL to http://localhost:3001/tasks ro run it on localhost instead of docker container
+    axios.get('http://task-retrieval-image:3001/tasks')
         .then(
-            (response) => console.log(response.data),
+            (response) => console.log('Updated Task List:', response.data),
             (error) => console.log(error)
         );
 }
@@ -45,6 +46,7 @@ app.put('/tasks/:taskId', async (req, res) => {
             req.body
         );
         if (updatedTask) {
+            console.log('Task updated successfully');
             getTaskList();
         }
         return res.status(200).json(updatedTask).end();
@@ -60,6 +62,7 @@ app.delete('/tasks/:taskId', async (req, res) => {
     try {
         const deletedTask = await Task.findOneAndDelete({ _id: req.params.taskId });
         if (deletedTask) {
+            console.log('Task deleted successfully');
             getTaskList();
         }
         return res.status(200).json(deletedTask).end();
